@@ -19,23 +19,34 @@ import sys
 Read in config file (/etc/dnsdynamic-updater/dnsdynamic-updater.conf), check current external IP, and if necessary, update
  the current one.
 """
-os.chdir("/")
-config = configparser.ConfigParser()
-conf_abs_path = "/etc/dnsdynamic-updater/dnsdynamic-updater.conf"
 
+# We have to check the config file this way because ConfigParser fails to raise an exeption on a missing file 
+conf_abs_path = '/etc/dnsdynamic-updater/dnsdynamic-updater.conf'
 if os.path.exists(conf_abs_path) is False:
     print("dnsdynamic-updater.conf file appears to be missing.")
     sys.exit(2)
 
+os.chdir("/")
+config = configparser.ConfigParser()
 config.read(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'etc', 'dnsdynamic-updater', 'dnsdynamic-updater.conf'))
 
-dyn_account = config['main']['dyn_account']
-dyn_passwd = config['main']['dyn_passwd']
-dyn_hostname = config['main']['dyn_hostname']
-ip_provider = config['main']['ip_provider']
-api_update_string = config['main']['api_update_string']
-debug_enabled = config['main'].getboolean('debug_enabled')
-last_known_ip = config['state']['last_known_ip']
+try:
+    dyn_account = config['main']['dyn_account']
+    dyn_passwd = config['main']['dyn_passwd']
+    dyn_hostname = config['main']['dyn_hostname']
+    ip_provider = config['main']['ip_provider']
+    api_update_string = config['main']['api_update_string']
+    debug_enabled = config['main'].getboolean('debug_enabled')
+    last_known_ip = config['state']['last_known_ip']
+except NameError as ne:
+    print(ne)
+    print("The configuration file exists but appears to be missing a section")
+    sys.exit(2)
+except KeyError as ke:
+    print(ke)
+    print("The configuration file exists but appears to be missing values") 
+    sys.exit(2)
+
 
 myipobj = requests.get(ip_provider)
 my_ip = myipobj.text
