@@ -47,11 +47,20 @@ except KeyError as ke:
     print("The configuration file exists but appears to be missing values") 
     sys.exit(2)
 
+try:
+    myipobj = requests.get(ip_provider)
+    my_ip = myipobj.text
+except Exception as iperr:
+    print(iperr)
+    print("Couldn't fetch our current IP; this could be a remote problem, try again later")
+    sys.exit(3)
 
-myipobj = requests.get(ip_provider)
-my_ip = myipobj.text
-my_record = socket.gethostbyname(dyn_hostname)
-
+try:
+    my_record = socket.gethostbyname(dyn_hostname)
+except Exception as reserr:
+    print(reserr)
+    print("Couldn't resolve the current IP record; this is usually transient and should be retried")
+    sys.exit(4)
 
 def check_update():
     global update_required
