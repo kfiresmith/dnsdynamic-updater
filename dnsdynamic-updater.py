@@ -3,7 +3,6 @@
 # A simple python script to keep DnsDynamic.net entries fresh.
 #
 # Kodiak Firesmith <kfiresmith@gmail.com>
-#  Released to the world without license, do what you will.
 # 
 #  Bugs / To-do:  
 #    - Write the state back to the conf file
